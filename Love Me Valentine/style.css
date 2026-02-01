@@ -1,0 +1,637 @@
+/* Modern Reset & Base Styles */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #ff54a4;
+  --primary-hover: #ffa4b1;
+  --bg-gradient: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%);
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  --text-color: #4a4a4a;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  /* Changed from grid to flex to allow scrolling content */
+  flex-direction: column;
+  align-items: center;
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  /* Keeps gradient fixed during scroll */
+  font-family: "Quicksand", sans-serif;
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 5px;
+}
+
+/* Question Container (First View) */
+.question-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 20px;
+  border: var(--glass-border);
+  box-shadow: var(--shadow);
+  padding: 3rem;
+  width: 90%;
+  max-width: 500px;
+  transition: all 0.5s ease;
+  z-index: 10;
+}
+
+.local-gif {
+  width: 100%;
+  max-width: 280px;
+  border-radius: 15px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.question {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #ff3366;
+  font-weight: 700;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  position: relative;
+  /* For button movement context */
+  min-height: 60px;
+  /* Space for buttons */
+}
+
+.btn {
+  border: none;
+  border-radius: 50px;
+  padding: 12px 30px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 84, 164, 0.4);
+}
+
+.btn:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(255, 84, 164, 0.6);
+}
+
+/* Result Container (Full Page Scroll) */
+.result-container {
+  display: none;
+  /* Hidden initially */
+  width: 100%;
+  max-width: 1200px;
+  padding: 2rem;
+  margin-top: 2rem;
+  opacity: 0;
+  /* Fade in effect */
+  animation: fadeInContainer 1s forwards;
+}
+
+@keyframes fadeInContainer {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Sections Common Styles */
+.header-section,
+.content-section {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  border: var(--glass-border);
+  box-shadow: var(--shadow);
+}
+
+.section-title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #ff3366;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+/* Header Section */
+.gif-result {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Horizontal Scroll Container */
+/* Horizontal Scroll Container */
+.horizontal-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2rem;
+  /* Space for scrollbar and shadow */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Hide standard scrollbar for cleaner look */
+  display: flex;
+  justify-content: flex-start;
+  scroll-snap-type: x mandatory;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.video-gallery.horizontal-scroll,
+.playlist.horizontal-scroll {
+  display: flex;
+  grid-template-columns: none;
+  /* Override grid */
+  gap: 1.5rem;
+  /* Reduced gap from 2rem */
+  padding: 1rem 1.5rem;
+  width: max-content;
+  /* Ensure container expands to fit content */
+  margin: 0 auto;
+  align-items: center;
+}
+
+/* Updated Video Card for Horizontal Scroll */
+.video-card {
+  min-width: 240px;
+  /* Match Spotify Card */
+  width: 240px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 1rem;
+  /* Match Spotify padding */
+  border-radius: 12px;
+  /* Match Spotify radius */
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  scroll-snap-align: center;
+}
+
+.video-card video {
+  width: 100%;
+  border-radius: 8px;
+  /* Match inner radius consistency */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.video-card p {
+  font-weight: 600;
+  color: #444;
+  margin: 0;
+  text-align: center;
+}
+
+/* Spotify Card Styling */
+.spotify-card {
+  min-width: 240px;
+  /* Reduced from 300px */
+  width: 240px;
+  background-color: #191414;
+  /* Spotify Black */
+  border-radius: 12px;
+  padding: 1rem;
+  /* Reduced padding */
+  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  /* Reduced gap */
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+}
+
+.spotify-card:hover {
+  transform: translateY(-5px) scale(1.02);
+}
+
+.spotify-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(30, 215, 96, 0.1) 0%, rgba(25, 20, 20, 0) 40%);
+  pointer-events: none;
+}
+
+.album-art {
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: #282828;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  margin-bottom: 0.2rem;
+}
+
+.album-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.track-info h4 {
+  font-size: 1rem;
+  /* Reduced font size */
+  margin-bottom: 0.1rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-info p {
+  font-size: 0.8rem;
+  /* Reduced font size */
+  color: #b3b3b3;
+}
+
+.player-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 3px;
+  /* Thinner */
+  background-color: #535353;
+  border-radius: 2px;
+  position: relative;
+}
+
+.progress {
+  width: 30%;
+  /* Mock progress */
+  height: 100%;
+  background-color: #1DB954;
+  /* Spotify Green */
+  border-radius: 2px;
+}
+
+.play-btn {
+  align-self: flex-end;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #1DB954;
+  border: none;
+  color: black;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.play-btn:hover {
+  transform: scale(1.1);
+  background-color: #1ed760;
+}
+
+/* WhatsApp Footer Styling */
+.whatsapp-message {
+  display: inline-block;
+  background-color: #dcf8c6;
+  /* WhatsApp Light Green */
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px 8px 8px 0;
+  /* Bubble shape */
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: Helvetica, Arial, sans-serif;
+  color: #303030;
+  font-size: 1.1rem;
+  max-width: 90%;
+  text-align: left;
+}
+
+.whatsapp-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid #dcf8c6;
+  border-left: 10px solid transparent;
+}
+
+.whatsapp-message .time {
+  font-size: 0.7rem;
+  color: #999;
+  margin-left: 10px;
+  float: right;
+  margin-top: 8px;
+}
+
+.whatsapp-message .check {
+  font-size: 0.7rem;
+  color: #4fc3f7;
+  /* Blue ticks */
+  margin-left: 5px;
+  float: right;
+  margin-top: 8px;
+}
+
+/* Lazy Load / Scroll Reveal Animation */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+}
+
+.scroll-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Remove old video-card and playlist styles that might conflict */
+/* video-gallery grid is overridden above by specificity */
+
+/* Emoji Grid */
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* 4 columns on desktop */
+  gap: 1rem;
+  font-size: 3rem;
+  justify-items: center;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.emoji-item {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: default;
+}
+
+.emoji-item:hover {
+  transform: scale(1.4) rotate(10deg);
+}
+
+/* Footer */
+.footer {
+  margin-bottom: 2rem;
+  font-family: "Great Vibes", cursive;
+  /* Assuming standard elegant font, or fallback */
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  opacity: 0.8;
+}
+
+/* Animation Utilities */
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .emoji-grid {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .question {
+    font-size: 2rem;
+  }
+
+  .result-container {
+    padding: 1rem;
+  }
+
+  .emoji-grid {
+    grid-template-columns: repeat(4, 1fr);
+    font-size: 2.2rem;
+  }
+}
+
+/* Heart Loader (Kept mostly same but centered better) */
+.cssload-main {
+  display: none;
+  position: fixed;
+  /* Fixed to cover screen */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+}
+
+.cssload-heart {
+  animation: cssload-heart 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
+  /* ... rest of existing keyframe animations are fine ... */
+}
+
+/* Re-include keyframes if needed, or assume they are standard */
+/* Including keyframes for completeness since we are replacing the file */
+
+.cssload-heartL {
+  width: 1em;
+  height: 1em;
+  border: 1px solid #ff0000;
+  background-color: #ff0000;
+  content: "";
+  position: absolute;
+  display: block;
+  border-radius: 100%;
+  animation: cssload-heartL 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
+  transform: translate(-28px, -27px);
+}
+
+.cssload-heartR {
+  width: 1em;
+  height: 1em;
+  border: 1px solid #ff0000;
+  background-color: #ff0000;
+  content: "";
+  position: absolute;
+  display: block;
+  border-radius: 100%;
+  transform: translate(28px, -27px);
+  animation: cssload-heartR 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
+}
+
+.cssload-square {
+  width: 1em;
+  height: 1em;
+  border: 1px solid #ff0000;
+  background-color: #ff0000;
+  position: relative;
+  display: block;
+  content: "";
+  transform: scale(1) rotate(-45deg);
+  animation: cssload-square 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
+}
+
+.cssload-shadow {
+  top: 97px;
+  left: 50%;
+  content: "";
+  position: relative;
+  display: block;
+  bottom: -0.5em;
+  width: 1em;
+  height: 0.24em;
+  background-color: rgb(215, 215, 215);
+  border: 1px solid rgb(215, 215, 215);
+  border-radius: 50%;
+  animation: cssload-shadow 2.88s cubic-bezier(0.75, 0, 0.5, 1) infinite normal;
+}
+
+@keyframes cssload-square {
+  50% {
+    border-radius: 100%;
+    transform: scale(0.5) rotate(-45deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(-45deg);
+  }
+}
+
+@keyframes cssload-heart {
+  50% {
+    transform: rotate(360deg);
+  }
+
+  100% {
+    transform: rotate(720deg);
+  }
+}
+
+@keyframes cssload-heartL {
+  60% {
+    transform: scale(0.4);
+  }
+}
+
+@keyframes cssload-heartR {
+  40% {
+    transform: scale(0.4);
+  }
+}
+
+@keyframes cssload-shadow {
+  50% {
+    transform: scale(0.5);
+    border-color: rgb(228, 228, 228);
+  }
+}
+
+/* Floating Hearts Animation */
+.floating-hearts {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.heart {
+  position: absolute;
+  bottom: -10vh;
+  font-size: 1.5rem;
+  color: rgba(255, 84, 164, 0.6);
+  animation: floatUp 10s linear forwards;
+  opacity: 0;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.8;
+  }
+
+  90% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translateY(-120vh) scale(1.2);
+    opacity: 0;
+  }
+}

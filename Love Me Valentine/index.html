@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Do you love me?</title>
+</head>
+
+<body>
+
+  <div class="question-container container">
+    <video class="local-gif" src="Reply me love.mp4" autoplay muted loop></video>
+    <h2 class="question">Do you love me?</h2>
+    <div class="button-container">
+      <button class="yes-btn btn js-yes-btn">Yes</button>
+      <button class="no-btn btn js-no-btn">No</button>
+    </div>
+  </div>
+  <div class="result-container">
+    <div class="header-section">
+      <video class="gif-result" src="Love me.mp4" autoplay loop muted playsinline></video>
+      <h2>I knew it! ❤️</h2>
+      <p class="subtitle">Welcome to our world of love...</p>
+    </div>
+
+    <div class="content-section" id="gallery">
+      <h3 class="section-title">Our Moments 🎥</h3>
+      <div class="horizontal-scroll-container">
+        <!-- Added horizontal-scroll-container wrapper -->
+        <div class="video-gallery horizontal-scroll">
+          <div class="video-card scroll-reveal">
+            <video src="Reply me love.mp4" controls></video>
+            <p>The Question 💍</p>
+          </div>
+          <!-- <div class="video-card scroll-reveal">
+            <video src="" controls></video>
+            <p>The Answer 🥰</p>
+          </div> -->
+          <div class="video-card scroll-reveal">
+            <video src="final video me.mp4" controls></video>
+            <p>Video 3 First Video</p>
+          </div>
+          <div class="video-card scroll-reveal">
+            <video src="final remo.mp4" controls></video>
+            <p>Video 4 Second Video</p>
+          </div>
+          <div class="video-card scroll-reveal">
+            <video src="dubai.mp4" controls></video>
+            <p>Video 4 Three Video</p>
+          </div>
+          <div class="video-card scroll-reveal">
+            <video src="Love me.mp4" controls></video>
+            <p>Video 4 Four Video</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-section" id="music">
+      <h3 class="section-title">Our Playlist 🎧</h3>
+      <div class="horizontal-scroll-container">
+        <div class="playlist horizontal-scroll">
+          <!-- Spotify Style Cards -->
+          <div class="spotify-card scroll-reveal">
+            <div class="album-art">
+              <img src="https://i.scdn.co/image/ab67616d0000b273ba5db46f4b838ef6027e6f96" alt="Album Art">
+            </div>
+            <div class="track-info">
+              <h4>Perfect</h4>
+              <p>Ed Sheeran</p>
+            </div>
+            <div class="player-controls">
+              <!-- Audio Element -->
+              <audio class="song-audio" src="Perfect (Acoustic).mp3"
+                preload="metadata"></audio>
+              <!-- Progress Bar -->
+              <div class="progress-container">
+                <input type="range" class="seek-slider" value="0" max="100">
+              </div>
+              <button class="play-btn">▶</button>
+            </div>
+          </div>
+
+          <div class="spotify-card scroll-reveal">
+            <div class="album-art">
+              <img src="https://i1.sndcdn.com/artworks-000082907592-w9sig7-t1080x1080.jpg" alt="Album Art">
+            </div>
+            <div class="track-info">
+              <h4>All of Me</h4>
+              <p>John Legend</p>
+            </div>
+            <div class="player-controls">
+              <audio class="song-audio" src="John Legend - All of Me (Lyrics).mp3"
+                preload="metadata"></audio>
+              <div class="progress-container">
+                <input type="range" class="seek-slider" value="0" max="100">
+              </div>
+              <button class="play-btn">▶</button>
+            </div>
+          </div>
+
+          <div class="spotify-card scroll-reveal">
+            <div class="album-art">
+              <img src="https://i.pinimg.com/736x/e5/cc/e7/e5cce704da4c7d8658701471a1b3b6f4.jpg" alt="Album Art">
+            </div>
+            <div class="track-info">
+              <h4>Just the Way...</h4>
+              <p>Bruno Mars</p>
+            </div>
+            <div class="player-controls">
+              <audio class="song-audio" src="Bruno Mars - Just The Way You Are (Lyrics).mp3"
+                preload="metadata"></audio>
+              <div class="progress-container">
+                <input type="range" class="seek-slider" value="0" max="100">
+              </div>
+              <button class="play-btn">▶</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-section" id="emojis">
+      <h3 class="section-title">Use Emojis To Express ❤️</h3>
+      <div class="emoji-grid">
+        <span class="emoji-item scroll-reveal">🥰</span>
+        <span class="emoji-item scroll-reveal">😘</span>
+        <span class="emoji-item scroll-reveal">💖</span>
+        <span class="emoji-item scroll-reveal">💑</span>
+        <span class="emoji-item scroll-reveal">💍</span>
+        <span class="emoji-item scroll-reveal">🌹</span>
+        <span class="emoji-item scroll-reveal">🧸</span>
+        <span class="emoji-item scroll-reveal">🍫</span>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="whatsapp-message">
+        <p>Message To Your Girlfriend:</p>
+        <p>Forever & Always ❤️ Whatever the Message It will Appear Here<span class="time">11:11 PM</span><span class="check">✓✓</span></p>
+      </div>
+    </footer>
+  </div>
+
+  <div class="cssload-main">
+    <div class="cssload-heart">
+      <span class="cssload-heartL"></span>
+      <span class="cssload-heartR"></span>
+      <span class="cssload-square"></span>
+    </div>
+    <div class="cssload-shadow"></div>
+  </div>
+  <div class="floating-hearts"></div>
+  <script src="script.js"></script>
+
+</body>
+
+</html>
