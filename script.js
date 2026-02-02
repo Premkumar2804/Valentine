@@ -233,13 +233,126 @@ function transitionTo(fromId, toId) {
   }, 500);
 }
 
-// 5. Envelope Logic
-const envelope = document.getElementById('envelope');
-if (envelope) {
-  envelope.addEventListener('click', () => {
-    envelope.classList.toggle('open');
-  });
+// 5. Quiz Custom Logic
+const quizData = [
+  {
+    question: "Who is the cutest person in the world 🌎?",
+    options: ["You", "Me", "My Cat"],
+    correct: 0 // "You" - The romantic answer
+  },
+  {
+    question: "What is my favorite place to be 📍?",
+    options: ["Paris", "In Your Arms", "The Fridge"],
+    correct: 1 // "In Your Arms"
+  },
+  {
+    question: "How much do I love you 💖?",
+    options: ["A lot", "To the moon & back", "Infinity & Beyond"],
+    correct: 2 // "Infinity & Beyond"
+  }
+];
+
+let currentQuestion = 0;
+
+function showGifts() {
+  document.getElementById('gift-section').classList.remove('hidden');
+  document.getElementById('quiz-section').classList.add('hidden');
+  document.getElementById('letter-section').classList.add('hidden');
+  document.getElementById('gallery-section').classList.add('hidden'); // Ensure gallery is hidden
+  // Reset feedback
+  document.getElementById('feedback-msg').textContent = "";
+  document.getElementById('feedback-msg').className = "feedback-msg";
 }
+
+function openQuiz(index) {
+  // If Gift 2 (Index 1) is clicked, open the Letter
+  if (index === 1) {
+    document.getElementById('gift-section').classList.add('hidden');
+    document.getElementById('letter-section').classList.remove('hidden');
+  }
+  // If Gift 3 (Index 2) is clicked, open the Gallery
+  else if (index === 2) {
+    document.getElementById('gift-section').classList.add('hidden');
+    document.getElementById('gallery-section').classList.remove('hidden');
+  }
+  // Otherwise open Quiz (Gift 1)
+  else {
+    currentQuestion = 0; // Always start at Q1 for Gift 1
+    document.getElementById('gift-section').classList.add('hidden');
+    document.getElementById('quiz-section').classList.remove('hidden');
+    renderQuestion();
+  }
+}
+
+function nextQuizQuestion() {
+  if (currentQuestion < quizData.length - 1) {
+    currentQuestion++;
+    renderQuestion();
+  }
+}
+
+function prevQuizQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion();
+  }
+}
+
+function renderQuestion() {
+  const data = quizData[currentQuestion];
+  document.getElementById('question-text').textContent = data.question;
+  const optionsGrid = document.getElementById('options-grid');
+  optionsGrid.innerHTML = ''; // Clear old options
+
+  // Reset feedback
+  document.getElementById('feedback-msg').textContent = "";
+  document.getElementById('feedback-msg').className = "feedback-msg";
+
+  data.options.forEach((option, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = option;
+    btn.onclick = () => checkAnswer(idx, btn);
+    optionsGrid.appendChild(btn);
+  });
+
+  // Navigation Button Logic
+  const prevBtn = document.getElementById('prev-quiz-btn');
+  const nextBtn = document.getElementById('next-quiz-btn');
+
+  if (currentQuestion === 0) {
+    prevBtn.style.display = 'none';
+  } else {
+    prevBtn.style.display = 'block';
+  }
+
+  if (currentQuestion === quizData.length - 1) {
+    nextBtn.style.display = 'none';
+  } else {
+    nextBtn.style.display = 'block';
+  }
+}
+
+function checkAnswer(selectedIndex, btnElement) {
+  const data = quizData[currentQuestion];
+  const feedbackEl = document.getElementById('feedback-msg');
+
+  if (selectedIndex === data.correct) {
+    feedbackEl.textContent = "Correct! You're so smart! 😍";
+    feedbackEl.className = "feedback-msg feedback correct";
+    btnElement.style.background = "#d4edda"; // Light green
+    btnElement.style.borderColor = "#28a745";
+  } else {
+    feedbackEl.textContent = "Ooho, please try again. 😜";
+    feedbackEl.className = "feedback-msg feedback wrong";
+    btnElement.style.background = "#f8d7da"; // Light red
+    btnElement.style.borderColor = "#dc3545";
+  }
+}
+
+// Expose functions to global scope for HTML onclick attributes
+window.openQuiz = openQuiz;
+window.showGifts = showGifts;
 
 // Change the position of no button
 function moveNoButton() {
