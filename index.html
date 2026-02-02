@@ -89,20 +89,94 @@
     </div>
   </div>
 
-  <!-- Step 5: Envelope -->
+  <!-- 5. Quiz/Gift Section (Replaces Envelope) -->
   <div id="intro-envelope" class="intro-screen" style="display: none;">
-    <div class="envelope-wrapper">
-      <div class="envelope" id="envelope">
-        <div class="front flap"></div>
-        <div class="front pocket"></div>
-        <div class="letter">
-          <div class="letter-content">
-            <p>To my love,<br><br>Every moment with you is magic. Open this to see how much you mean to me.<br><br>Love
-              always.</p>
-          </div>
+    <!-- Gift Selection Screen -->
+    <div id="gift-section">
+      <h2 class="section-title">Something for You</h2>
+      <div class="gifts-container">
+        <div class="gift-card" onclick="openQuiz(0)">
+          <div class="gift-icon">🐱</div> <!-- Replace with image if needed -->
+          <h3>Gift 1</h3>
         </div>
-        <div class="heart-seal">❤️</div>
+        <div class="gift-card" onclick="openQuiz(1)">
+          <div class="gift-icon">🐻</div>
+          <h3>Gift 2</h3>
+        </div>
+        <div class="gift-card" onclick="openQuiz(2)">
+          <div class="gift-icon">🐰</div>
+          <h3>Gift 3</h3>
+        </div>
       </div>
+    </div>
+
+    <!-- Quiz Screen (Hidden by default) -->
+    <div id="quiz-section" class="hidden">
+      <h2 class="section-title">Quiz for you 😚</h2>
+      <div class="question-card">
+        <h3 id="question-text">Question goes here?</h3>
+        <div id="options-grid" class="options-grid">
+          <!-- Options injected via JS -->
+        </div>
+        <p id="feedback-msg" class="feedback-msg"></p>
+
+        <!-- Navigation Buttons -->
+        <div class="quiz-nav">
+          <button id="prev-quiz-btn" onclick="prevQuizQuestion()" style="display:none;">← Prev</button>
+          <button id="next-quiz-btn" onclick="nextQuizQuestion()">Next →</button>
+        </div>
+
+        <button id="back-btn" onclick="showGifts()">EXIT QUIZ</button>
+      </div>
+    </div>
+
+    <!-- Letter Screen (Hidden by default) - Triggered by Gift 2 -->
+    <div id="letter-section" class="hidden">
+      <h2 class="section-title">A Letter For You 🥺</h2>
+      <div class="letter-card-static"> <!-- Renamed to avoid confusion with animated letter -->
+        <p class="letter-text">
+          <strong>My Baby,</strong><br><br>
+          Thank you for being my person. I want to hold your hand through every season of life.
+          You are my home. You are my everything, and I love you so so much.
+          Be the same as you are and no sorry for irritating you. No one can replace you from my heart,
+          you'll always be my no.1.<br><br>
+          Forever yours. ❤️
+        </p>
+        <button id="back-btn-letter" onclick="showGifts()">← BACK</button>
+      </div>
+    </div>
+
+    <!-- Gallery Screen (Hidden by default) - Triggered by Gift 3 -->
+    <div id="gallery-section" class="hidden">
+      <h2 class="section-title">Look at this cutie 😭</h2>
+      <div class="polaroid-grid">
+        <div class="polaroid-item">
+          <!-- Sample Cat Images -->
+          <img src="https://loremflickr.com/300/300/cat?random=1" alt="Sweet Hello" class="polaroid-img">
+          <p class="caption">Sweet Hello</p>
+        </div>
+        <div class="polaroid-item">
+          <img src="https://loremflickr.com/300/300/cat?random=2" alt="True Smile" class="polaroid-img">
+          <p class="caption">True Smile</p>
+        </div>
+        <div class="polaroid-item">
+          <img src="https://loremflickr.com/300/300/cat?random=3" alt="Perfect Day" class="polaroid-img">
+          <p class="caption">Perfect Day</p>
+        </div>
+        <div class="polaroid-item">
+          <img src="https://loremflickr.com/300/300/cat?random=4" alt="Only Us" class="polaroid-img">
+          <p class="caption">Only Us</p>
+        </div>
+        <div class="polaroid-item">
+          <img src="https://loremflickr.com/300/300/cat?random=5" alt="My Home" class="polaroid-img">
+          <p class="caption">My Home</p>
+        </div>
+        <div class="polaroid-item">
+          <img src="https://loremflickr.com/300/300/cat?random=6" alt="Forever Us" class="polaroid-img">
+          <p class="caption">Forever Us</p>
+        </div>
+      </div>
+      <button id="back-btn-gallery" onclick="showGifts()">← BACK</button>
     </div>
     <div class="nav-buttons">
       <button class="prev-step-btn" data-prev="intro-timer">← Previous page</button>
@@ -138,44 +212,41 @@
             <video src="" controls></video>
             <p>The Answer 🥰</p>
           </div> -->
-                  
+
           <div class="video-card scroll-reveal">
-  <video controls preload="metadata" playsinline>
-    <source 
-      src="https://media.githubusercontent.com/media/Premkumar2804/Valentine/main/final%20video%20me.mp4" 
-      type="video/mp4">
-  </video>
-  <p>Video 3 First Video</p>
-</div>
+            <video controls preload="metadata" playsinline>
+              <source
+                src="https://media.githubusercontent.com/media/Premkumar2804/Valentine/main/final%20video%20me.mp4"
+                type="video/mp4">
+            </video>
+            <p>Video 3 First Video</p>
+          </div>
 
-<div class="video-card scroll-reveal">
-  <video controls preload="metadata" playsinline>
-    <source 
-      src="https://media.githubusercontent.com/media/Premkumar2804/Valentine/main/final%20remo.mp4" 
-      type="video/mp4">
-  </video>
-  <p>Video 4 Second Video</p>
-</div>
+          <div class="video-card scroll-reveal">
+            <video controls preload="metadata" playsinline>
+              <source src="https://media.githubusercontent.com/media/Premkumar2804/Valentine/main/final%20remo.mp4"
+                type="video/mp4">
+            </video>
+            <p>Video 4 Second Video</p>
+          </div>
 
-<div class="video-card scroll-reveal">
-  <video controls preload="metadata" playsinline>
-    <source 
-      src="https://media.githubusercontent.com/media/Premkumar2804/Valentine/main/dubai.mp4" 
-      type="video/mp4">
-  </video>
-  <p>Video 5 Dubai</p>
-</div>
+          <div class="video-card scroll-reveal">
+            <video controls preload="metadata" playsinline>
+              <source src="https://media.githubusercontent.com/media/Premkumar2804/Valentine/main/dubai.mp4"
+                type="video/mp4">
+            </video>
+            <p>Video 5 Dubai</p>
+          </div>
 
-<div class="video-card scroll-reveal">
-  <video controls preload="metadata" playsinline>
-    <source 
-      src="https://media.githubusercontent.com/media/Premkumar2804/Valentine/main/Love%20me.mp4" 
-      type="video/mp4">
-  </video>
-  <p>Video 6 Love</p>
-</div>
+          <div class="video-card scroll-reveal">
+            <video controls preload="metadata" playsinline>
+              <source src="https://media.githubusercontent.com/media/Premkumar2804/Valentine/main/Love%20me.mp4"
+                type="video/mp4">
+            </video>
+            <p>Video 6 Love</p>
+          </div>
 
-          
+
         </div>
       </div>
     </div>
