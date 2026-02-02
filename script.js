@@ -59,12 +59,11 @@ keys.forEach(key => {
         } else {
           // Error: Shake and Reset
           const container = document.querySelector('.passcode-container');
-          container.animate([
-            { transform: 'translateX(0)' },
-            { transform: 'translateX(-10px)' },
-            { transform: 'translateX(10px)' },
-            { transform: 'translateX(0)' }
-          ], { duration: 300 });
+          container.classList.add('shake');
+
+          setTimeout(() => {
+            container.classList.remove('shake');
+          }, 500);
 
           setTimeout(() => {
             enteredCode = "";
