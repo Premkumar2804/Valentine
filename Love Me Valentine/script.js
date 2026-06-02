@@ -1,418 +1,656 @@
-const questionContainer = document.querySelector("#main-question");
-const resultContainer = document.querySelector(".result-container");
-const gifResult = document.querySelector(".gif-result");
-const heartLoader = document.querySelector(".cssload-main");
-const yesBtn = document.querySelector(".js-yes-btn");
-const noBtn = document.querySelector(".js-no-btn");
+// ============================================================
+//  DATE NIGHT — script.js
+//  All screen logic, quiz engine, letters exchange, animations
+// ============================================================
 
+// -- CONFIG --
+const targetPasscode = "1304";
 
-// ==========================================
-//  CONFIG: CUSTOMIZE YOUR PAGE HERE
-// ==========================================
-const CONFIG = {
-  // Passcode to unlock the first screen
-  passcode: "1234",
+// -- STATE --
+let enteredCode = "";
+let currentQuestionIndex = 0;
 
-  // Target Date for the countdown (Valentine's Day)
-  // Month is 0-indexed: 0 = Jan, 1 = Feb, ... 11 = Dec
-  targetDate: new Date(2026, 1, 14) // Feb 14, 2026
-};
-// ==========================================
+// -- QUIZ DATA --
+const QUIZ_QUESTIONS = [
+  {
+    question: "What is my favourite place in Asia?",
+    options: ["Hong Kong", "In Your Arms 🤍", "Singapore"],
+    answer: 1
+  },
+  {
+    question: "Who do I love most?",
+    options: ["Mom", "Alma 💕", "Rice"],
+    answer: 1
+  },
+  {
+    question: "My favourite moment of ours?",
+    options: ["Sogo", "Eye Bar", "Disneyland 🏰"],
+    answer: 2
+  },
+  {
+    question: "Who holds the key to my heart?",
+    options: ["Alma 🔑", "Brad Pitt", "Johnny Depp"],
+    answer: 0
+  }
+];
 
-// --- 5-Step Intro Flow Logic ---
+// -- HEART CANVAS PARTICLE SIMULATION --
+let heartCanvasAnimId = null;
+let canvasElement = null;
+let canvasCtx = null;
+let heartParticles = [];
 
-// 1. Passcode Logic
+function initHeartCanvas() {
+  canvasElement = document.getElementById('heart-canvas');
+  if (!canvasElement) return;
+  canvasCtx = canvasElement.getContext('2d');
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  
+  // Start loop
+  animateHeartCanvas();
+}
+
+function resizeCanvas() {
+  if (canvasElement) {
+    canvasElement.width = window.innerWidth;
+    canvasElement.height = window.innerHeight;
+  }
+}
+
+class HeartParticle {
+  constructor() {
+    this.reset(true);
+  }
+
+  reset(init = false) {
+    this.x = Math.random() * (canvasElement ? canvasElement.width : window.innerWidth);
+    this.y = init ? Math.random() * (canvasElement ? canvasElement.height : window.innerHeight) : (canvasElement ? canvasElement.height + 20 : window.innerHeight + 20);
+    this.size = Math.random() * 15 + 8;
+    this.speedY = -(Math.random() * 1.5 + 0.5);
+    this.speedX = Math.random() * 1.0 - 0.5;
+    this.opacity = Math.random() * 0.5 + 0.2;
+    this.fadeSpeed = Math.random() * 0.003 + 0.0015;
+    
+    const colors = [
+      'rgba(255, 84, 164, ',
+      'rgba(255, 51, 102, ',
+      'rgba(255, 164, 177, ',
+      'rgba(255, 214, 231, '
+    ];
+    this.colorPrefix = colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX;
+    this.opacity -= this.fadeSpeed;
+
+    if (this.opacity <= 0 || this.y < -20 || (canvasElement && (this.x < -20 || this.x > canvasElement.width + 20))) {
+      this.reset(false);
+    }
+  }
+
+  draw() {
+    if (!canvasCtx) return;
+    canvasCtx.save();
+    canvasCtx.globalAlpha = this.opacity;
+    canvasCtx.fillStyle = this.colorPrefix + '1)';
+    
+    canvasCtx.beginPath();
+    const x = this.x;
+    const y = this.y;
+    const w = this.size;
+    const h = this.size;
+    const topCurveHeight = h * 0.3;
+    
+    canvasCtx.moveTo(x, y + topCurveHeight);
+    canvasCtx.bezierCurveTo(
+      x - w / 2, y - topCurveHeight / 2,
+      x - w, y + h / 3,
+      x, y + h
+    );
+    canvasCtx.bezierCurveTo(
+      x + w, y + h / 3,
+      x + w / 2, y - topCurveHeight / 2,
+      x, y + topCurveHeight
+    );
+    
+    canvasCtx.closePath();
+    canvasCtx.fill();
+    canvasCtx.restore();
+  }
+}
+
+function animateHeartCanvas() {
+  if (!canvasElement || !canvasCtx) return;
+  
+  const passcodeScreen = document.getElementById('screen-passcode');
+  if (!passcodeScreen || passcodeScreen.style.display === 'none' || !passcodeScreen.classList.contains('active-screen')) {
+    heartCanvasAnimId = requestAnimationFrame(animateHeartCanvas);
+    return;
+  }
+
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+  if (heartParticles.length === 0) {
+    const particleCount = Math.min(60, Math.floor(window.innerWidth / 20));
+    for (let i = 0; i < particleCount; i++) {
+      heartParticles.push(new HeartParticle());
+    }
+  }
+
+  heartParticles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+
+  heartCanvasAnimId = requestAnimationFrame(animateHeartCanvas);
+}
+
+// ============================================================
+//  SCREEN MANAGER
+// ============================================================
+function showScreen(screenId) {
+  const screens = document.querySelectorAll('.view-screen');
+  screens.forEach(screen => {
+    if (screen.id === screenId) {
+      screen.style.display = 'flex';
+      // Wait one frame so display change registers before transition
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          screen.classList.add('active-screen');
+        });
+      });
+    } else {
+      screen.classList.remove('active-screen');
+      setTimeout(() => {
+        if (!screen.classList.contains('active-screen')) {
+          screen.style.display = 'none';
+        }
+      }, 500);
+    }
+  });
+
+  // Re-trigger scroll animations for photo album
+  if (screenId === 'screen-album') {
+    setTimeout(handleScrollAnimations, 200);
+  }
+
+  // Reset quiz when entering games
+  if (screenId === 'screen-games') {
+    currentQuestionIndex = 0;
+    const bar = document.querySelector('.quiz-progress');
+    if (bar) bar.style.width = '0%';
+    loadQuizQuestion();
+  }
+
+  // Scroll to top of new screen
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+//  PASSCODE SCREEN
+// ============================================================
 const passcodeDots = document.querySelectorAll('.passcode-dots .dot');
 const keys = document.querySelectorAll('.key');
-let enteredCode = "";
+const passcodeContainerEl = document.querySelector('.passcode-container');
+const passcodeLoadingEl = document.querySelector('.passcode-loading');
 
 keys.forEach(key => {
   key.addEventListener('click', () => {
-    const value = key.innerText;
+    const value = key.innerText.trim();
 
     if (value === '😍') {
-      createBubble(key, "😍");
-      return; // Don't add emoji to the passcode
+      createEmojiBurst(key, "😍", 12);
+      return;
     }
 
     if (value === 'C') {
       enteredCode = "";
-      updateDots();
+      updatePasscodeDots();
       return;
     }
 
     if (enteredCode.length < 4) {
       enteredCode += value;
-      updateDots(); // Update visual immediately
+      updatePasscodeDots();
 
       if (enteredCode.length === 4) {
-        // Determine if full code is correct
-        if (enteredCode === CONFIG.passcode) {
-          // Full Success: Show spinner and transition
-          const loadingSpinner = document.querySelector('.passcode-loading');
-          if (loadingSpinner) loadingSpinner.style.display = 'block';
-
+        if (enteredCode === targetPasscode) {
+          // SUCCESS — hearts burst + loading spinner → dashboard
+          passcodeLoadingEl.style.display = 'block';
+          createEmojiBurst(passcodeContainerEl, "❤️", 20);
+          createEmojiBurst(passcodeContainerEl, "🌹", 10);
           setTimeout(() => {
-            transitionTo('intro-passcode', 'intro-google');
-            if (loadingSpinner) loadingSpinner.style.display = 'none';
-          }, 1500);
+            passcodeLoadingEl.style.display = 'none';
+            showScreen('screen-date-night');
+          }, 1400);
         } else {
-          // Error: Shake and Reset
-          const container = document.querySelector('.passcode-container');
-          container.animate([
-            { transform: 'translateX(0)' },
-            { transform: 'translateX(-10px)' },
-            { transform: 'translateX(10px)' },
-            { transform: 'translateX(0)' }
-          ], { duration: 300 });
-
+          // WRONG — shake + reset
+          passcodeContainerEl.classList.add('quiz-shake');
           setTimeout(() => {
+            passcodeContainerEl.classList.remove('quiz-shake');
             enteredCode = "";
-            updateDots();
-          }, 400);
+            updatePasscodeDots();
+          }, 600);
         }
       }
     }
   });
 });
 
-function createBubble(targetElement) {
-  // Create a LARGE burst of hearts (YouTube style)
-  const burstCount = 15; // Bunch of bubbles
-
-  for (let i = 0; i < burstCount; i++) {
-    setTimeout(() => {
-      const bubble = document.createElement('div');
-      // Mix of emojis for variety or keep uniform
-      bubble.innerText = "😍";
-      bubble.classList.add('bubble-emoji');
-
-      // Randomize styling
-      const size = Math.random() * 2 + 1.5; // Bigger sizes: 1.5rem to 3.5rem
-      bubble.style.fontSize = `${size}rem`;
-
-      // Randomize Animation Duration for organic feel
-      const duration = Math.random() * 1.5 + 1.5; // 1.5s to 3s
-      bubble.style.animationDuration = `${duration}s`;
-
-      // Position it at the center of the button
-      const rect = targetElement.getBoundingClientRect();
-
-      // Start centered but with WIDER jitter
-      const startX = rect.left + (rect.width / 2) - 20 + (Math.random() * 60 - 30);
-      const startY = rect.top + (Math.random() * 40 - 20);
-
-      bubble.style.left = `${startX}px`;
-      bubble.style.top = `${startY}px`;
-
-      // Wide Trajectory
-      // Move left or right by -100px to +100px
-      const randomX = Math.random() * 60 - 30;
-      const randomXEnd = Math.random() * 200 - 100;
-
-      bubble.style.setProperty('--random-x', `${randomX}px`);
-      bubble.style.setProperty('--random-x-end', `${randomXEnd}px`);
-
-      document.body.appendChild(bubble);
-
-      // Remove after animation
-      setTimeout(() => {
-        bubble.remove();
-      }, duration * 1000);
-    }, i * 50); // Fast stagger
-  }
-}
-
-function updateDots() {
+function updatePasscodeDots() {
   passcodeDots.forEach((dot, index) => {
     dot.classList.remove('active', 'correct-step');
-
     if (index < enteredCode.length) {
-      // Check if this specific digit is correct according to the config
-      if (enteredCode[index] === CONFIG.passcode[index]) {
-        dot.classList.add('correct-step'); // Green Tick
+      if (enteredCode[index] === targetPasscode[index]) {
+        dot.classList.add('correct-step');
       } else {
-        dot.classList.add('active'); // White Dot
+        dot.classList.add('active');
       }
     }
   });
 }
 
-// 2. Google Search Logic
-const googleSearchBtn = document.querySelector('.js-google-search-btn');
-const googleInput = document.querySelector('.search-input');
-
-function handleGoogleSearch() {
-  // Only proceed if user has typed something
-  if (googleInput && googleInput.value.trim() !== "") {
-    transitionTo('intro-google', 'intro-timer');
-    startTimer();
-  }
-}
-
-if (googleSearchBtn) {
-  googleSearchBtn.addEventListener('click', handleGoogleSearch);
-}
-
-if (googleInput) {
-  googleInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      handleGoogleSearch();
-    }
-  });
-}
-
-// 3. Timer Logic
-let timerInterval;
-
-function startTimer() {
-  function updateTimer() {
-    const now = new Date();
-    const diff = CONFIG.targetDate - now; // Countdown logic
-
-    if (diff <= 0) {
-      // Target reached
-      document.getElementById('days').innerText = "00";
-      document.getElementById('hours').innerText = "00";
-      document.getElementById('minutes').innerText = "00";
-      document.getElementById('seconds').innerText = "00";
-      clearInterval(timerInterval);
-      return;
-    }
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / 1000 / 60) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
-
-    document.getElementById('days').innerText = String(days).padStart(2, '0');
-    document.getElementById('hours').innerText = String(hours).padStart(2, '0');
-    document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
-    document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
-  }
-
-  updateTimer();
-  timerInterval = setInterval(updateTimer, 1000);
-}
-
-// Navigation Buttons Generic Logic
-document.querySelectorAll('.next-step-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const nextId = btn.getAttribute('data-next');
-    const currentScreen = btn.closest('.intro-screen');
-
-    if (nextId === 'main-question') {
-      // Final transition to original flow
-      currentScreen.style.display = 'none';
-      questionContainer.style.display = 'block';
-      clearInterval(timerInterval);
-    } else {
-      transitionTo(currentScreen.id, nextId);
-    }
+// ============================================================
+//  NAVIGATION — Dashboard option cards
+// ============================================================
+document.querySelectorAll('.option-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const target = card.getAttribute('data-target');
+    showScreen(target);
   });
 });
 
-document.querySelectorAll('.prev-step-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const prevId = btn.getAttribute('data-prev');
-    const currentScreen = btn.closest('.intro-screen');
-    transitionTo(currentScreen.id, prevId);
+// Back buttons — need to stop propagation to avoid triggering parent card clicks
+document.querySelectorAll('.back-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    pauseAllAudio();
+    const target = btn.getAttribute('data-target');
+    showScreen(target);
   });
 });
 
-function transitionTo(fromId, toId) {
-  const fromScreen = document.getElementById(fromId);
-  const toScreen = document.getElementById(toId);
+// Movie Night "Next Page" button
+const nextToAlbumBtn = document.getElementById('next-to-album-btn');
+if (nextToAlbumBtn) {
+  nextToAlbumBtn.addEventListener('click', () => {
+    showScreen('screen-album');
+  });
+}
 
-  fromScreen.style.opacity = '0';
+// ============================================================
+//  QUIZ PLANET
+// ============================================================
+const quizContentArea = document.getElementById('quiz-question-card');
+const quizProgressBarEl = document.querySelector('.quiz-progress');
+
+function loadQuizQuestion() {
+  if (!quizContentArea) return;
+
+  if (currentQuestionIndex >= QUIZ_QUESTIONS.length) {
+    showQuizCompletion();
+    return;
+  }
+
+  const percent = (currentQuestionIndex / QUIZ_QUESTIONS.length) * 100;
+  if (quizProgressBarEl) quizProgressBarEl.style.width = `${percent}%`;
+
+  const q = QUIZ_QUESTIONS[currentQuestionIndex];
+
+  quizContentArea.style.opacity = '0';
+  quizContentArea.style.transform = 'translateY(15px)';
+
   setTimeout(() => {
-    fromScreen.style.display = 'none';
-    toScreen.style.display = 'flex';
-    setTimeout(() => {
-      toScreen.style.opacity = '1';
-    }, 50);
-  }, 500);
+    quizContentArea.innerHTML = `
+      <div class="quiz-q-num">Question ${currentQuestionIndex + 1} / ${QUIZ_QUESTIONS.length}</div>
+      <div class="quiz-question">${q.question}</div>
+      <div class="quiz-options">
+        ${q.options.map((opt, idx) => `
+          <button class="quiz-opt-btn" id="qopt-${idx}" onclick="handleQuizAnswer(${idx}, this)">
+            <span class="opt-text">${opt}</span>
+            <span class="indicator"></span>
+          </button>
+        `).join('')}
+      </div>
+      <div id="quiz-feedback" class="quiz-feedback-container"></div>
+    `;
+    quizContentArea.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    quizContentArea.style.opacity = '1';
+    quizContentArea.style.transform = 'translateY(0)';
+  }, 150);
 }
 
-// 5. Envelope Logic
+window.handleQuizAnswer = function(selectedIndex, element) {
+  const q = QUIZ_QUESTIONS[currentQuestionIndex];
+  const allBtns = document.querySelectorAll('.quiz-opt-btn');
+  const feedbackEl = document.getElementById('quiz-feedback');
+
+  // Lock all buttons
+  allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+  if (selectedIndex === q.answer) {
+    element.classList.add('quiz-correct');
+    element.querySelector('.indicator').innerText = '❤️';
+    createEmojiBurst(element, "💖", 10);
+    createEmojiBurst(element, "🌹", 6);
+    createEmojiBurst(element, "✨", 8);
+
+    // Motivational correct text responses
+    const correctMsgs = [
+      "Perfect! You know me so well! ❤️",
+      "Yay! You're my brilliant love! 💖",
+      "Spot on, my sweetheart! You're amazing! 🌟",
+      "Yes! My heart is doing flips for you! 💓",
+      "Correct! You hold the key to my heart! 🔑"
+    ];
+    const msg = correctMsgs[Math.floor(Math.random() * correctMsgs.length)];
+    if (feedbackEl) {
+      feedbackEl.innerText = msg;
+      feedbackEl.className = "quiz-feedback-container quiz-feedback-msg feedback-correct";
+    }
+
+    setTimeout(() => {
+      currentQuestionIndex++;
+      loadQuizQuestion();
+    }, 1800);
+  } else {
+    element.classList.add('quiz-incorrect');
+    element.querySelector('.indicator').innerText = '❌';
+
+    // Sweet/lovely wrong answer responses
+    const incorrectMsgs = [
+      "Almost there, my love! Try again! 💕",
+      "Oopsie! Close, but not quite, sweetheart! 🥰",
+      "Try again, my darling! I believe in you! 🌸",
+      "Not quite, my sweet! Let's try once more! 💖",
+      "Close! Your love is warm, try another choice! 😘"
+    ];
+    const msg = incorrectMsgs[Math.floor(Math.random() * incorrectMsgs.length)];
+    if (feedbackEl) {
+      feedbackEl.innerText = msg;
+      feedbackEl.className = "quiz-feedback-container quiz-feedback-msg feedback-incorrect";
+    }
+
+    quizContentArea.classList.add('quiz-shake');
+    setTimeout(() => {
+      quizContentArea.classList.remove('quiz-shake');
+      element.classList.remove('quiz-incorrect');
+      element.querySelector('.indicator').innerText = '';
+      if (feedbackEl) {
+        feedbackEl.innerText = "";
+        feedbackEl.className = "quiz-feedback-container";
+      }
+      allBtns.forEach(b => {
+        b.style.pointerEvents = 'auto';
+        b.classList.remove('quiz-incorrect');
+        if (b.querySelector('.indicator')) b.querySelector('.indicator').innerText = '';
+      });
+    }, 1800);
+  }
+};
+
+function showQuizCompletion() {
+  if (quizProgressBarEl) quizProgressBarEl.style.width = '100%';
+
+  quizContentArea.style.opacity = '0';
+  setTimeout(() => {
+    quizContentArea.innerHTML = `
+      <div class="quiz-completion">
+        <div class="quiz-completion-icon">🏆</div>
+        <h3 style="font-size:1.6rem; color:#ff3366; margin-bottom:0.8rem;">You did it!</h3>
+        <p style="color:#666; font-size:1.05rem; line-height:1.6; margin-bottom:2rem;">
+          You know me perfectly! That means only one thing —<br>
+          you truly are my person. 💕
+        </p>
+        <button class="action-btn" onclick="showScreen('screen-date-night')">
+          ← Back to Date Night
+        </button>
+      </div>
+    `;
+    quizContentArea.style.transition = 'opacity 0.5s ease';
+    quizContentArea.style.opacity = '1';
+
+    // Celebratory burst!
+    setTimeout(() => {
+      const card = document.querySelector('.games-container');
+      if (card) {
+        createEmojiBurst(card, "🎉", 15);
+        createEmojiBurst(card, "💖", 15);
+        createEmojiBurst(card, "🌹", 10);
+        createEmojiBurst(card, "✨", 12);
+      }
+    }, 300);
+  }, 150);
+}
+
+// ============================================================
+//  LETTERS EXCHANGE
+// ============================================================
 const envelope = document.getElementById('envelope');
 if (envelope) {
   envelope.addEventListener('click', () => {
     envelope.classList.toggle('open');
+    if (envelope.classList.contains('open')) {
+      createEmojiBurst(envelope, "💌", 8);
+      createEmojiBurst(envelope, "💕", 6);
+    }
   });
 }
 
-// Change the position of no button
-function moveNoButton() {
-  // Get viewport dimensions
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
+const sendReplyBtn = document.getElementById('send-reply-btn');
+const replyTextarea = document.getElementById('reply-textarea');
+const airplaneContainer = document.getElementById('airplane-animation-container');
 
-  // Get button dimensions
-  const btnWidth = noBtn.offsetWidth;
-  const btnHeight = noBtn.offsetHeight;
-
-  // Calculate max allowable positions (keep within viewport with a margin)
-  const padding = 20;
-  const maxX = viewportWidth - btnWidth - padding;
-  const maxY = viewportHeight - btnHeight - padding;
-
-  // Generate random coordinates within bounds
-  const newX = Math.max(padding, Math.floor(Math.random() * maxX));
-  const newY = Math.max(padding, Math.floor(Math.random() * maxY));
-
-  noBtn.style.position = "fixed"; // Fixed positioning ensures it stays within viewport relative to screen
-  noBtn.style.left = `${newX}px`;
-  noBtn.style.top = `${newY}px`;
-  noBtn.style.zIndex = "100"; // Ensure it floats above other elements
-}
-
-noBtn.addEventListener("mouseover", moveNoButton);
-noBtn.addEventListener("click", moveNoButton); // Add click for mobile/touch support
-
-// Yes button functionality
-yesBtn.addEventListener("click", () => {
-  questionContainer.style.display = "none";
-  heartLoader.style.display = "inherit";
-
-  const timeoutId = setTimeout(() => {
-    heartLoader.style.display = "none";
-    resultContainer.style.display = "block";
-
-    // Play the video
-    if (gifResult) {
-      gifResult.play();
-    }
-
-    // Trigger animations for elements already in view
-    handleScrollAnimations();
-  }, 3000);
-});
-
-// Scroll Animation Observer (Lazy Load Reveal)
-const observerOptions = {
-  root: null,
-  rootMargin: '0px',
-  threshold: 0.1
-};
-
-const observer = new IntersectionObserver((entries, observer) => {
-  entries.forEach((entry, index) => {
-    if (entry.isIntersecting) {
-      // Add a small delay based on index for staggered effect if multiple enter at once
+if (sendReplyBtn) {
+  sendReplyBtn.addEventListener('click', () => {
+    const text = replyTextarea ? replyTextarea.value.trim() : '';
+    if (!text) {
+      // Shake the textarea gently
+      replyTextarea.classList.add('quiz-shake');
+      replyTextarea.style.borderColor = '#ff3b30';
       setTimeout(() => {
-        entry.target.classList.add('visible');
-      }, index * 100);
-      observer.unobserve(entry.target);
+        replyTextarea.classList.remove('quiz-shake');
+        replyTextarea.style.borderColor = '';
+      }, 600);
+      return;
     }
+
+    // Save to LocalStorage as a keepsake
+    localStorage.setItem('love_letter_reply', text);
+    localStorage.setItem('love_letter_date', new Date().toLocaleDateString('en-GB'));
+
+    // Launch airplane animation
+    if (airplaneContainer) {
+      const airplane = document.createElement('div');
+      airplane.innerText = "✈️";
+      airplane.classList.add('paper-airplane');
+      airplaneContainer.appendChild(airplane);
+      setTimeout(() => airplane.remove(), 2200);
+    }
+
+    // Launch heart burst
+    createEmojiBurst(sendReplyBtn, "💌", 10);
+    createEmojiBurst(sendReplyBtn, "💖", 8);
+
+    // Update UI
+    if (replyTextarea) replyTextarea.disabled = true;
+    sendReplyBtn.disabled = true;
+    sendReplyBtn.innerText = "Letter Sent! 💖";
+    sendReplyBtn.style.background = "#4cd964";
+    sendReplyBtn.style.boxShadow = "0 4px 15px rgba(76, 217, 100, 0.4)";
   });
-}, observerOptions);
-
-function handleScrollAnimations() {
-  const animatedElements = document.querySelectorAll('.scroll-reveal');
-  animatedElements.forEach(el => observer.observe(el));
-
-  // Also observe fade-in elements if any remain
-  const fadeInElements = document.querySelectorAll('.fade-in');
-  fadeInElements.forEach(el => observer.observe(el));
 }
 
-// Music Player Logic
-// Music Player Logic
+// ============================================================
+//  MUSIC PLAYER (Photo Album)
+// ============================================================
 const playBtns = document.querySelectorAll('.play-btn');
-const sliders = document.querySelectorAll('.seek-slider');
+const seekSliders = document.querySelectorAll('.seek-slider');
 const audios = document.querySelectorAll('.song-audio');
+
+function pauseAllAudio() {
+  audios.forEach((audio, i) => {
+    audio.pause();
+    if (playBtns[i]) playBtns[i].textContent = '▶';
+  });
+}
 
 playBtns.forEach((btn, index) => {
   const audio = audios[index];
-  const slider = sliders[index];
+  const slider = seekSliders[index];
+  if (!audio || !slider) return;
 
-  // Toggle Play/Pause
   btn.addEventListener('click', function () {
     const isPlaying = !audio.paused;
 
-    // Pause all other audios
-    audios.forEach((otherAudio, i) => {
+    // Pause others
+    audios.forEach((a, i) => {
       if (i !== index) {
-        otherAudio.pause();
-        otherAudio.currentTime = 0; // Optional: Reset others
-        playBtns[i].textContent = '▶';
-        playBtns[i].style.backgroundColor = '#1DB954';
-        playBtns[i].style.transform = 'scale(1)';
+        a.pause();
+        a.currentTime = 0;
+        if (playBtns[i]) playBtns[i].textContent = '▶';
       }
     });
 
     if (isPlaying) {
       audio.pause();
       this.textContent = '▶';
-      this.style.backgroundColor = '#1DB954';
-      this.style.transform = 'scale(1)';
     } else {
-      audio.play();
+      audio.play().catch(err => console.warn("Audio play blocked:", err));
       this.textContent = '⏸';
-      this.style.backgroundColor = '#1ed760';
-      this.style.transform = 'scale(1.1)';
     }
   });
 
-  // Update Slider as Song Plays
   audio.addEventListener('timeupdate', () => {
     if (audio.duration) {
-      const progressPercent = (audio.currentTime / audio.duration) * 100;
-      slider.value = progressPercent;
-      // Update slider background to look like a progress bar
-      slider.style.background = `linear-gradient(to right, #1DB954 ${progressPercent}%, #535353 ${progressPercent}%)`;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      slider.value = pct;
+      slider.style.background = `linear-gradient(to right, var(--primary-color) ${pct}%, #535353 ${pct}%)`;
     }
   });
 
-  // Seek Functionality
   slider.addEventListener('input', () => {
     if (audio.duration) {
-      const seekTime = (slider.value / 100) * audio.duration;
-      audio.currentTime = seekTime;
-      // Update gradient immediately while dragging
-      slider.style.background = `linear-gradient(to right, #1DB954 ${slider.value}%, #535353 ${slider.value}%)`;
+      audio.currentTime = (slider.value / 100) * audio.duration;
+      slider.style.background = `linear-gradient(to right, var(--primary-color) ${slider.value}%, #535353 ${slider.value}%)`;
     }
   });
 
-  // Reset when song ends
   audio.addEventListener('ended', () => {
     btn.textContent = '▶';
-    btn.style.backgroundColor = '#1DB954';
-    btn.style.transform = 'scale(1)';
-    slider.value = 100; // Keep at end
-    slider.style.background = 'linear-gradient(to right, #1DB954 100%, #535353 100%)';
+    slider.value = 0;
+    slider.style.background = `linear-gradient(to right, var(--primary-color) 0%, #535353 0%)`;
   });
 });
 
-// Initialize observer
-document.addEventListener('DOMContentLoaded', () => {
-  handleScrollAnimations();
-});
+// ============================================================
+//  EMOJI BURST ENGINE  (reused everywhere)
+// ============================================================
+function createEmojiBurst(targetElement, emoji, count = 10) {
+  const rect = targetElement.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
 
-// Floating Hearts Logic
-const floatingHeartsContainer = document.querySelector(".floating-hearts");
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const bubble = document.createElement('div');
+      bubble.innerText = emoji;
+      bubble.classList.add('bubble-emoji');
 
-function createHeart() {
-  const heart = document.createElement("div");
-  heart.classList.add("heart");
+      const size = Math.random() * 1.6 + 1.1;
+      bubble.style.fontSize = `${size}rem`;
+      bubble.style.left = `${cx + (Math.random() * 40 - 20)}px`;
+      bubble.style.top = `${cy + (Math.random() * 20 - 10)}px`;
 
-  // Array of Valentine-themed emojis
-  const emojis = ["❤️", "💖", "💘", "💝", "💕", "💞", "💓", "💗"];
-  heart.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+      const rx = Math.random() * 100 - 50;
+      const rxEnd = Math.random() * 280 - 140;
+      bubble.style.setProperty('--random-x', `${rx}px`);
+      bubble.style.setProperty('--random-x-end', `${rxEnd}px`);
 
-  // Randomize properties
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.animationDuration = Math.random() * 5 + 5 + "s"; // 5-10s
-  heart.style.fontSize = Math.random() * 1.5 + 1 + "rem"; // 1-2.5rem
+      const dur = Math.random() * 1.4 + 1.0;
+      bubble.style.animationDuration = `${dur}s`;
 
-  floatingHeartsContainer.appendChild(heart);
-
-  // Remove heart after animation completes
-  setTimeout(() => {
-    heart.remove();
-  }, 10000); // Max animation duration (matched with max animation duration in CSS roughly)
+      document.body.appendChild(bubble);
+      setTimeout(() => bubble.remove(), dur * 1000 + 50);
+    }, i * 45);
+  }
 }
 
-// Start creating hearts
-setInterval(createHeart, 500); // New heart every 500ms
+// ============================================================
+//  SCROLL REVEAL OBSERVER
+// ============================================================
+const revealObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach((entry, idx) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+      }, idx * 120);
+      obs.unobserve(entry.target);
+    }
+  });
+}, { root: null, rootMargin: '0px', threshold: 0.1 });
+
+function handleScrollAnimations() {
+  document.querySelectorAll('.scroll-reveal').forEach(el => {
+    el.classList.remove('visible'); // Reset so re-entering triggers again
+    revealObserver.observe(el);
+  });
+}
+
+// ============================================================
+//  EMOJI GRID INTERACTIVITY
+// ============================================================
+document.querySelectorAll('.emoji-item').forEach(item => {
+  item.addEventListener('click', () => {
+    createEmojiBurst(item, item.innerText, 8);
+  });
+});
+
+// ============================================================
+//  FLOATING HEARTS & ROSES BACKGROUND
+// ============================================================
+const floatingHeartsContainer = document.querySelector(".floating-hearts");
+const BG_EMOJIS = ["❤️", "💖", "🌹", "💝", "💕", "🌹", "💓", "💗", "🌹", "💘", "🌸"];
+
+function spawnBackgroundEmoji() {
+  if (!floatingHeartsContainer) return;
+  const el = document.createElement("div");
+  el.classList.add("heart");
+  el.innerText = BG_EMOJIS[Math.floor(Math.random() * BG_EMOJIS.length)];
+  el.style.left = Math.random() * 100 + "vw";
+  const dur = Math.random() * 6 + 7;
+  el.style.animationDuration = `${dur}s`;
+  el.style.fontSize = (Math.random() * 1.4 + 1.0) + "rem";
+  // Random horizontal drift
+  el.style.setProperty('--drift', `${Math.random() * 60 - 30}px`);
+  floatingHeartsContainer.appendChild(el);
+  setTimeout(() => el.remove(), dur * 1000);
+}
+
+setInterval(spawnBackgroundEmoji, 550);
+
+// ============================================================
+//  INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Initial screen: passcode (already displayed)
+  const passcodeScreen = document.getElementById('screen-passcode');
+  if (passcodeScreen) {
+    passcodeScreen.style.display = 'flex';
+    requestAnimationFrame(() => passcodeScreen.classList.add('active-screen'));
+  }
+
+  // Initialize 3D heart particle canvas background
+  initHeartCanvas();
+
+  handleScrollAnimations();
+
+  // Restore saved letter if exists
+  const savedLetter = localStorage.getItem('love_letter_reply');
+  if (savedLetter && replyTextarea) {
+    replyTextarea.value = savedLetter;
+  }
+});

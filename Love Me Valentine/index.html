@@ -6,17 +6,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <title>Do you love me?</title>
+  <title>Our Date Night ❤️</title>
 </head>
 
 <body>
 
-  <!-- Step 1: Passcode -->
-  <div id="intro-passcode" class="intro-screen">
-    <div class="passcode-container">
+  <!-- Floating Hearts & Roses Background -->
+  <div class="floating-hearts"></div>
+
+  <!-- Screen 1: Passcode Lock Screen -->
+  <div id="screen-passcode" class="view-screen active-screen">
+
+    <!-- Full-screen 3D heart particle canvas (lock screen only) -->
+    <canvas id="heart-canvas"></canvas>
+
+    <!-- Orbiting hearts ring -->
+    <div class="orbit-ring" id="orbit-ring">
+      <span class="orbit-heart" style="--i:0">❤️</span>
+      <span class="orbit-heart" style="--i:1">🌹</span>
+      <span class="orbit-heart" style="--i:2">💖</span>
+      <span class="orbit-heart" style="--i:3">💕</span>
+      <span class="orbit-heart" style="--i:4">❤️</span>
+      <span class="orbit-heart" style="--i:5">🌹</span>
+      <span class="orbit-heart" style="--i:6">💗</span>
+      <span class="orbit-heart" style="--i:7">💘</span>
+    </div>
+
+    <!-- 3D CSS Heart -->
+    <div class="heart-3d-wrapper">
+      <div class="heart-3d">
+        <div class="heart-3d-left"></div>
+        <div class="heart-3d-right"></div>
+      </div>
+      <div class="heart-glow-ring"></div>
+    </div>
+
+    <!-- Passcode Card -->
+    <div class="passcode-container glass-card">
+      <div class="lock-icon-wrap">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-ripple"></div>
+        <div class="lock-ripple lock-ripple-2"></div>
+      </div>
       <h2>Enter Passcode</h2>
+      <p class="lock-subtitle">Unlock our special night ✨</p>
       <div class="passcode-dots">
         <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
       </div>
@@ -26,143 +61,172 @@
         <button class="key">7</button><button class="key">8</button><button class="key">9</button>
         <button class="key">😍</button><button class="key">0</button><button class="key">C</button>
       </div>
-      <p class="passcode-hint">Hint: 1234</p>
-      <div class="passcode-loading"></div>
-    </div>
-  </div>
-
-  <!-- Step 2: Google Search -->
-  <div id="intro-google" class="intro-screen" style="display: none;">
-    <div class="google-container">
-      <h1 class="google-logo"><span class="g-blue">G</span><span class="g-red">o</span><span
-          class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span
-          class="g-red">e</span></h1>
-      <div class="search-bar">
-        <span class="search-icon">
-          <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path
-              d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-              fill="#9aa0a6"></path>
-          </svg>
-        </span>
-        <input type="text" class="search-input" value="how long have we been together?">
-        <span class="mic-icon">
-          <svg focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" fill="#4285f4">
-            </path>
-            <path
-              d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"
-              fill="#34a853"></path>
-          </svg>
-        </span>
-      </div>
-
-      <div class="google-buttons">
-        <button class="google-btn js-google-search-btn">Google Search</button>
+      <p class="passcode-hint">💡 "The day we met at Dr. Wine (dd/mm)"</p>
+      <div class="passcode-loading">
+        <div class="spinner"></div>
       </div>
     </div>
   </div>
 
-  <!-- Step 3: Timer -->
-  <div id="intro-timer" class="intro-screen" style="display: none;">
-    <div class="timer-container">
-      <h2>Counting down to meet you:</h2>
-      <div class="timer-display">
-        <div class="time-unit"><span id="days">00</span>
-          <p>Days</p>
-        </div>
-        <div class="separator">:</div>
-        <div class="time-unit"><span id="hours">00</span>
-          <p>Hours</p>
-        </div>
-        <div class="separator">:</div>
-        <div class="time-unit"><span id="minutes">00</span>
-          <p>Minutes</p>
-        </div>
-        <div class="separator">:</div>
-        <div class="time-unit"><span id="seconds">00</span>
-          <p>Seconds</p>
-        </div>
-      </div>
-      <p class="timer-subtext"> See you soon! </p>
-      <button class="next-step-btn" data-next="intro-envelope">Next page →</button>
-    </div>
-  </div>
 
-  <!-- Step 5: Envelope -->
-  <div id="intro-envelope" class="intro-screen" style="display: none;">
-    <div class="envelope-wrapper">
-      <div class="envelope" id="envelope">
-        <div class="front flap"></div>
-        <div class="front pocket"></div>
-        <div class="letter">
-          <div class="letter-content">
-            <p>To my love,<br><br>Every moment with you is magic. Open this to see how much you mean to me.<br><br>Love
-              always.</p>
-          </div>
+  <!-- Screen 2: Date Night Dashboard -->
+  <div id="screen-date-night" class="view-screen" style="display: none;">
+    <div class="dashboard-container">
+      <h1 class="dashboard-title">Our Date Night ✨</h1>
+      <p class="dashboard-subtitle">Select an adventure to begin our magic evening...</p>
+
+      <div class="options-grid">
+        <!-- Option 1: Games Date -->
+        <div class="option-card glass-card" data-target="screen-games">
+          <div class="option-cover">🎮</div>
+          <h3>Games Date</h3>
+          <p>Challenge me in our special quiz match!</p>
+          <span class="option-btn">Play →</span>
         </div>
-        <div class="heart-seal">❤️</div>
-      </div>
-    </div>
-    <div class="nav-buttons">
-      <button class="prev-step-btn" data-prev="intro-timer">← Previous page</button>
-      <button class="next-step-btn js-final-next" data-next="main-question">Next page →</button>
-    </div>
-  </div>
 
-  <div class="question-container container" id="main-question" style="display: none;">
-    <video class="local-gif" src="Reply me love.mp4" autoplay muted loop></video>
-    <h2 class="question">Do you love me?</h2>
-    <div class="button-container">
-      <button class="yes-btn btn js-yes-btn">Yes</button>
-      <button class="no-btn btn js-no-btn">No</button>
-    </div>
-  </div>
-  <div class="result-container">
-    <div class="header-section">
-      <video class="gif-result" src="Love me.mp4" autoplay loop muted playsinline></video>
-      <h2>I knew it! ❤️</h2>
-      <p class="subtitle">Welcome to our world of love...</p>
-    </div>
+        <!-- Option 2: Letters Exchange -->
+        <div class="option-card glass-card" data-target="screen-letters">
+          <div class="option-cover">💌</div>
+          <h3>Letters Exchange</h3>
+          <p>Read my love letters and write your own exchange.</p>
+          <span class="option-btn">Read & Write →</span>
+        </div>
 
-    <div class="content-section" id="gallery">
-      <h3 class="section-title">Our Moments 🎥</h3>
-      <div class="horizontal-scroll-container">
-        <!-- Added horizontal-scroll-container wrapper -->
-        <div class="video-gallery horizontal-scroll">
-          <div class="video-card scroll-reveal">
-            <video src="Reply me love.mp4" controls></video>
-            <p>The Question 💍</p>
-          </div>
-          <!-- <div class="video-card scroll-reveal">
-            <video src="" controls></video>
-            <p>The Answer 🥰</p>
-          </div> -->
-          <div class="video-card scroll-reveal">
-            <video src="final video me.mp4" controls></video>
-            <p>Video 3 First Video</p>
-          </div>
-          <div class="video-card scroll-reveal">
-            <video src="final remo.mp4" controls></video>
-            <p>Video 4 Second Video</p>
-          </div>
-          <div class="video-card scroll-reveal">
-            <video src="dubai.mp4" controls></video>
-            <p>Video 4 Three Video</p>
-          </div>
-          <div class="video-card scroll-reveal">
-            <video src="Love me.mp4" controls></video>
-            <p>Video 4 Four Video</p>
-          </div>
+        <!-- Option 3: Movie Night -->
+        <div class="option-card glass-card" data-target="screen-movie">
+          <div class="option-cover">🎬</div>
+          <h3>Movie Night</h3>
+          <p>Cosy up for our cinema selection & photos.</p>
+          <span class="option-btn">Watch →</span>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="content-section" id="music">
-      <h3 class="section-title">Our Playlist 🎧</h3>
-      <div class="horizontal-scroll-container">
-        <div class="playlist horizontal-scroll">
-          <!-- Spotify Style Cards -->
+  <!-- Screen 3: Games Night (Quiz Planet) -->
+  <div id="screen-games" class="view-screen" style="display: none;">
+    <div class="games-container glass-card">
+      <button class="back-btn" data-target="screen-date-night">← Back</button>
+      <h2 class="quiz-title">Quiz Planet 🪐</h2>
+
+      <!-- Progress Bar -->
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress" style="width: 0%"></div>
+      </div>
+
+      <!-- Quiz Content Area -->
+      <div id="quiz-question-card" class="question-card">
+        <!-- Questions injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 4: Letters Exchange -->
+  <div id="screen-letters" class="view-screen" style="display: none;">
+    <div class="letters-container glass-card">
+      <button class="back-btn" data-target="screen-date-night">← Back</button>
+      <h2>Letters Exchange 💌</h2>
+      <p class="sub-label">A space for our unspoken words...</p>
+
+      <div class="envelope-wrapper">
+        <div class="envelope" id="envelope">
+          <div class="front flap"></div>
+          <div class="front pocket"></div>
+          <div class="letter">
+            <div class="letter-content">
+              <p>To my love,<br><br>Every single day with you feels like a beautiful dream. You make me laugh, you hold my hand when I need it, and you're my favorite place to be. Thank you for being my today and all of my tomorrows.<br><br>Love always, ❤️</p>
+            </div>
+          </div>
+          <div class="heart-seal">❤️</div>
+        </div>
+      </div>
+
+      <div class="reply-section">
+        <h3>Write a reply to me ✍️</h3>
+        <textarea id="reply-textarea" placeholder="Write your love letter here..."></textarea>
+        <button id="send-reply-btn" class="action-btn">Send Letter ✈️</button>
+        <div id="airplane-animation-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 5: Movie Night -->
+  <div id="screen-movie" class="view-screen" style="display: none;">
+    <div class="movie-container glass-card">
+      <button class="back-btn" data-target="screen-date-night">← Back</button>
+      <h2>Movie Night 🎬</h2>
+      <p class="sub-label">Tonight's curated Cinema selection</p>
+
+      <div class="movies-list">
+        <div class="movie-item glass-card">
+          <div class="movie-emoji">🍿</div>
+          <div class="movie-details">
+            <h4>Romantic Movie Night</h4>
+            <p>A beautiful cozy evening with popcorn, warm blankets, and our favorite romantic film playing.</p>
+          </div>
+        </div>
+        <div class="movie-item glass-card">
+          <div class="movie-emoji">🌌</div>
+          <div class="movie-details">
+            <h4>Watching the Stars</h4>
+            <p>Sharing whispered stories under the starry sky, wrapped in love.</p>
+          </div>
+        </div>
+      </div>
+
+      <button id="next-to-album-btn" class="action-btn next-page-btn" data-target="screen-album">Next Page: Photo Album of us →</button>
+    </div>
+  </div>
+
+  <!-- Screen 6: Photo Album & Moments -->
+  <div id="screen-album" class="view-screen" style="display: none;">
+    <div class="album-container">
+      <button class="back-btn" data-target="screen-date-night">← Back</button>
+      <h2 class="album-title">Our Moments 🎥 & Playlist 🎧</h2>
+      <p class="album-subtitle">Strolling down memory lane...</p>
+
+      <!-- Video Gallery (Polaroid style) -->
+      <div class="album-section">
+        <h3 class="section-title">Photo Album 📸</h3>
+        <div class="polaroid-grid">
+          <div class="polaroid-card scroll-reveal">
+            <div class="polaroid-media">
+              <video src="Reply me love.mp4" controls></video>
+            </div>
+            <p class="polaroid-caption">The Question 💍</p>
+          </div>
+          <div class="polaroid-card scroll-reveal">
+            <div class="polaroid-media">
+              <video src="final video me.mp4" controls></video>
+            </div>
+            <p class="polaroid-caption">First Video 🥰</p>
+          </div>
+          <div class="polaroid-card scroll-reveal">
+            <div class="polaroid-media">
+              <video src="final remo.mp4" controls></video>
+            </div>
+            <p class="polaroid-caption">Second Video 💕</p>
+          </div>
+          <div class="polaroid-card scroll-reveal">
+            <div class="polaroid-media">
+              <video src="dubai.mp4" controls></video>
+            </div>
+            <p class="polaroid-caption">Three Video ✈️</p>
+          </div>
+          <div class="polaroid-card scroll-reveal">
+            <div class="polaroid-media">
+              <video src="Love me.mp4" controls></video>
+            </div>
+            <p class="polaroid-caption">Four Video ❤️</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playlist Section -->
+      <div class="album-section">
+        <h3 class="section-title">Our Playlist 🎧</h3>
+        <div class="playlist-container">
+          <!-- Track 1 -->
           <div class="spotify-card scroll-reveal">
             <div class="album-art">
               <img src="https://i.scdn.co/image/ab67616d0000b273ba5db46f4b838ef6027e6f96" alt="Album Art">
@@ -172,9 +236,7 @@
               <p>Ed Sheeran</p>
             </div>
             <div class="player-controls">
-              <!-- Audio Element -->
               <audio class="song-audio" src="Perfect (Acoustic).mp3" preload="metadata"></audio>
-              <!-- Progress Bar -->
               <div class="progress-container">
                 <input type="range" class="seek-slider" value="0" max="100">
               </div>
@@ -182,6 +244,7 @@
             </div>
           </div>
 
+          <!-- Track 2 -->
           <div class="spotify-card scroll-reveal">
             <div class="album-art">
               <img src="https://i1.sndcdn.com/artworks-000082907592-w9sig7-t1080x1080.jpg" alt="Album Art">
@@ -199,12 +262,13 @@
             </div>
           </div>
 
+          <!-- Track 3 -->
           <div class="spotify-card scroll-reveal">
             <div class="album-art">
               <img src="https://i.pinimg.com/736x/e5/cc/e7/e5cce704da4c7d8658701471a1b3b6f4.jpg" alt="Album Art">
             </div>
             <div class="track-info">
-              <h4>Just the Way...</h4>
+              <h4>Just the Way You Are</h4>
               <p>Bruno Mars</p>
             </div>
             <div class="player-controls">
@@ -217,42 +281,46 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="content-section" id="emojis">
-      <h3 class="section-title">Use Emojis To Express ❤️</h3>
-      <div class="emoji-grid">
-        <span class="emoji-item scroll-reveal">🥰</span>
-        <span class="emoji-item scroll-reveal">😘</span>
-        <span class="emoji-item scroll-reveal">💖</span>
-        <span class="emoji-item scroll-reveal">💑</span>
-        <span class="emoji-item scroll-reveal">💍</span>
-        <span class="emoji-item scroll-reveal">🌹</span>
-        <span class="emoji-item scroll-reveal">🧸</span>
-        <span class="emoji-item scroll-reveal">🍫</span>
+      <!-- Emoji Express Grid -->
+      <div class="album-section">
+        <h3 class="section-title">Use Emojis To Express ❤️</h3>
+        <div class="emoji-grid">
+          <span class="emoji-item scroll-reveal">🥰</span>
+          <span class="emoji-item scroll-reveal">😘</span>
+          <span class="emoji-item scroll-reveal">💖</span>
+          <span class="emoji-item scroll-reveal">💑</span>
+          <span class="emoji-item scroll-reveal">💍</span>
+          <span class="emoji-item scroll-reveal">🌹</span>
+          <span class="emoji-item scroll-reveal">🧸</span>
+          <span class="emoji-item scroll-reveal">🍫</span>
+        </div>
       </div>
-    </div>
 
-    <footer class="footer">
-      <div class="whatsapp-message">
-        <p>Message To Your Girlfriend:</p>
-        <p>Forever & Always ❤️ Whatever the Message It will Appear Here<span class="time">11:11 PM</span><span
-            class="check">✓✓</span></p>
-      </div>
-    </footer>
+      <!-- Footer Message -->
+      <footer class="footer">
+        <div class="whatsapp-message">
+          <p>Message To Your Girlfriend:</p>
+          <p>Forever & Always ❤️ Every second with you counts.<span class="time">11:11 PM</span><span
+              class="check">✓✓</span></p>
+        </div>
+      </footer>
+    </div>
   </div>
 
-  <div class="cssload-main">
-    <div class="cssload-heart">
-      <span class="cssload-heartL"></span>
-      <span class="cssload-heartR"></span>
-      <span class="cssload-square"></span>
+  <!-- Loading Transition Overlay -->
+  <div class="loader-overlay" style="display: none;">
+    <div class="cssload-main">
+      <div class="cssload-heart">
+        <span class="cssload-heartL"></span>
+        <span class="cssload-heartR"></span>
+        <span class="cssload-square"></span>
+      </div>
+      <div class="cssload-shadow"></div>
     </div>
-    <div class="cssload-shadow"></div>
   </div>
-  <div class="floating-hearts"></div>
+
   <script src="script.js"></script>
-
 </body>
 
 </html>
